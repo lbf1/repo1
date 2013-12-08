@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#only for merge commits
+if [ -e .git/MERGE_HEAD ]; then
+	echo pre-commit
+	#git submodule update --merge
+	
+	merge_head=`cat .git/MERGE_HEAD`
+	merge_sub=`git rev-parse $merge_head:sub`
+	
+	cd sub
+	export GIT_TRACE=1
+	git merge $merge_sub
+	ret=$?
+	cd ..
+	if [ "$ret" != "0" ]; then
+		echo submodule merge failed
+		exit $ret
+	fi
+	
+	git add sub
+fi
